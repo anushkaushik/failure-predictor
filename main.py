@@ -104,3 +104,4 @@ def predictions(run_id: str | None = None, limit: int = Query(20, ge=1, le=200),
         return docs[:limit]
     q = col.order_by("timestamp", direction=firestore.Query.DESCENDING).limit(limit)
     return [d.to_dict() for d in q.stream()]
+# redeployed by CI
