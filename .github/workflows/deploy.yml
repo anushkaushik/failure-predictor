@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 env:
   SERVICE: failure-predictor
   REGION: asia-south1
@@ -24,13 +27,24 @@ jobs:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
-      - uses: google-github-actions/auth@v2
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          project_id: failure-predictor-511319
+          workload_identity_provider: projects/749545237028/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: github-deployer@failure-predictor-511319.iam.gserviceaccount.com
+
       - uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
-          source: .
+          source: .    steps:
+      - uses: actions/checkout@v4
+
